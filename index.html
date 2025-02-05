@@ -6,7 +6,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="src/style.css" />
@@ -26,7 +26,12 @@
           />
           <input type="submit" value="Search" class="search-form-button" />
         </form>
+
+        <div class="unit-toggle">
+          <button id="unit-toggle-button">Switch to °C</button>
+        </div>
       </header>
+
       <main>
         <div class="weather-app-data">
           <div>
@@ -41,25 +46,29 @@
           </div>
           <div class="weather-app-temp-container">
             <div id="icon"></div>
-            <div class="weather-app-temp" id="temperature"></div>
-            <div class="weather-app-unit">°F</div>
+            <div class="weather-app-temp">
+              <span id="temperature"></span>
+              <span class="weather-app-unit" id="unit">°F</span>
+            </div>
           </div>
         </div>
       </main>
+
       <footer>
         This project was coded by
         <a href="https://github.com/acarden44" target="_blank">April Carden</a>,
         and is
         <a
-          href="https://github.com/acarden44/Final-Project-Weather-App "
+          href="https://github.com/acarden44/Final-Project-Weather-App"
           target="_blank"
           >open-sourced on GitHub</a
         >, and
         <a href="https://cardenweatherapp.netlify.app/" target="_blank"
-          >hosted on Netify.</a
+          >hosted on Netlify.</a
         >
       </footer>
     </div>
+
     <script src="src/index.js"></script>
   </body>
 </html>
