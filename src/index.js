@@ -100,7 +100,7 @@ function displayForecast() {
           <div class="weather-forecast-temp">
             <strong>15º</strong>
           </div>
-          <div class="weather-forecast-temperature">9º</div>
+          <div class="weather-forecast-temp">9º</div>
         </div>
       </div>
     `;
