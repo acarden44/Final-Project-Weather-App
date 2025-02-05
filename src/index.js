@@ -1,6 +1,7 @@
 let isMetric = false;
 let currentTemperature = null;
 let currentWindSpeed = null;
+let forecastData = []; // Store forecast data to update when toggling units
 
 function refreshWeather(response) {
   let temperatureElement = document.querySelector("#temperature");
@@ -22,6 +23,8 @@ function refreshWeather(response) {
   temperatureElement.innerHTML = Math.round(currentTemperature);
   windSpeedElement.innerHTML = `${Math.round(currentWindSpeed)} mph`;
   iconElement.innerHTML = `<img src="${response.data.condition.icon_url}" class="weather-app-icon" />`;
+
+  getForecast(response.data.city);
 }
 
 function formatDate(date) {
@@ -52,11 +55,14 @@ function toggleUnits() {
   let toggleButton = document.querySelector("#unit-toggle-button");
 
   if (isMetric) {
+    // Convert back to Fahrenheit
     temperatureElement.innerHTML = Math.round(currentTemperature);
     windSpeedElement.innerHTML = `${Math.round(currentWindSpeed)} mph`;
     unitElement.innerHTML = "°F";
     toggleButton.innerHTML = "Switch to °C";
+    updateForecastTemps(false);
   } else {
+    // Convert to Celsius
     temperatureElement.innerHTML = Math.round(
       (currentTemperature - 32) * (5 / 9)
     );
@@ -65,7 +71,9 @@ function toggleUnits() {
     )} kph`;
     unitElement.innerHTML = "°C";
     toggleButton.innerHTML = "Switch to °F";
+    updateForecastTemps(true);
   }
+
   isMetric = !isMetric;
 }
 
@@ -74,41 +82,64 @@ document
   .addEventListener("click", toggleUnits);
 
 function searchCity(city) {
-  let apiKey = "b2a5adcct04b33178913oc335f405433";
+  let apiKey = "3b34c40446ftcf4f07e329o00aa2e010";
   let apiUrl = `https://api.shecodes.io/weather/v1/current?query=${city}&key=${apiKey}&units=imperial`;
   axios.get(apiUrl).then(refreshWeather);
 }
 
-document.querySelector("#search-form").addEventListener("submit", (event) => {
+function handleSearchSubmit(event) {
   event.preventDefault();
   let searchInput = document.querySelector("#search-form-input");
   searchCity(searchInput.value);
-});
+}
 
-function displayForecast() {
-  let days = ["Tue", "Wed", "Thu", "Fri", "Sat"];
+function formatDay(timestamp) {
+  let date = new Date(timestamp * 1000);
+  let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  return days[date.getDay()];
+}
+
+function getForecast(city) {
+  let apiKey = "3b34c40446ftcf4f07e329o00aa2e010";
+  let apiUrl = `https://api.shecodes.io/weather/v1/forecast?query=${city}&key=${apiKey}&units=imperial`;
+  axios.get(apiUrl).then(displayForecast);
+}
+
+function displayForecast(response) {
+  forecastData = response.data.daily; // Store forecast data
+  updateForecastTemps(isMetric);
+}
+
+function updateForecastTemps(toMetric) {
   let forecastHtml = "";
 
-  days.forEach(function (day) {
-    forecastHtml =
-      forecastHtml +
-      `
-      <div class="weather-forecast-day">
-        <div class="weather-forecast-date">${day}</div>
-        <div class="weather-forecast-icon">🌤️</div>
-        <div class="weather-forecast-temps">
-          <div class="weather-forecast-temp">
-            <strong>15º</strong>
+  forecastData.forEach(function (day, index) {
+    if (index < 5) {
+      let maxTemp = toMetric
+        ? Math.round((day.temperature.maximum - 32) * (5 / 9))
+        : Math.round(day.temperature.maximum);
+      let minTemp = toMetric
+        ? Math.round((day.temperature.minimum - 32) * (5 / 9))
+        : Math.round(day.temperature.minimum);
+
+      forecastHtml += `
+        <div class="weather-forecast-day">
+          <div class="weather-forecast-date">${formatDay(day.time)}</div>
+          <img src="${day.condition.icon_url}" class="icon" />
+          <div class="weather-forecast-temps">
+            <div class="weather-forecast-temp"><strong>${maxTemp}º</strong></div>
+            <div class="weather-forecast-temperature">${minTemp}º</div>
           </div>
-          <div class="weather-forecast-temp">9º</div>
         </div>
-      </div>
-    `;
+      `;
+    }
   });
 
   let forecastElement = document.querySelector("#forecast");
   forecastElement.innerHTML = forecastHtml;
 }
 
+let searchFormElement = document.querySelector("#search-form");
+searchFormElement.addEventListener("submit", handleSearchSubmit);
+
 searchCity("Grand Rapids");
-displayForecast();
